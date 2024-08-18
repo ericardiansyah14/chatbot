@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eBook with Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background animation */
+.background-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Behind the main content */
+    background: radial-gradient(circle, rgba(255, 204, 0, 0.8), rgba(255, 204, 0, 0.5));
+    animation: animate-background 10s infinite;
+}
+
+@keyframes animate-background {
+    0% {
+        background: radial-gradient(circle, rgba(255, 204, 0, 0.8), rgba(255, 204, 0, 0.5));
+    }
+    25% {
+        background: radial-gradient(circle, rgba(255, 204, 0, 0.7), rgba(255, 204, 0, 0.4));
+    }
+    50% {
+        background: radial-gradient(circle, rgba(255, 204, 0, 0.5), rgba(255, 204, 0, 0.3));
+    }
+    75% {
+        background: radial-gradient(circle, rgba(255, 204, 0, 0.6), rgba(255, 204, 0, 0.4));
+    }
+    100% {
+        background: radial-gradient(circle, rgba(255, 204, 0, 0.8), rgba(255, 204, 0, 0.5));
+    }
+}
+
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Pesan pengguna */
+        .user-message {
+            background-color: #e1f5fe;
+            color: #0277bd;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+            align-self: flex-end;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+
+        /* Pesan bot */
+        .bot-message {
+            background-color: #f1f1f1;
+            color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+            align-self: flex-start;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+
+        /* Kontainer pesan */
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ebook-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .page {
+            width: 210mm; /* A4 width */
+            height: 297mm; /* A4 height */
+            max-width: 100%;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .page img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            width: 100%;
+            max-width: 480px;
+            height: 80vh;
+            max-height: 600px;
+            background-color: #fff;
+            box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            opacity: 0; /* Mulai dengan chatbot tersembunyi */
+            transform: translateY(20px); /* Mulai dengan posisi sedikit lebih rendah */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .chat-container.open {
+            opacity: 1; /* Tampilkan chatbot */
+            transform: translateY(0); /* Posisi chatbot kembali ke posisi normal */
+        }
+
+        .chat-header {
+            background: orange;
+            color: white;
+            padding: 16px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-bottom: 2px solid orange;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .chat-input button {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background-color: orange;
+        }
+
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: orange;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            z-index: 10;
+        }
+
+        .chat-toggle:hover {
+            background-color: orange;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                bottom: 75px;
+                right: 10px;
+                max-width: 95%;
+                height: 70vh;
+                max-height: 500px;
+            }
+
+            .chat-toggle {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .page {
+                width: 100%;
+                height: auto;
+            }
+            .chat-input button{
+                font-size: 12px;
+                width: 45px;
+                height: 30px;
+                padding: 5px 5px;
+                margin-right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <div class="ebook-container">
+            <!-- Pages -->
+            <div class="page"><img src="{{ url_for('static', filename='1.png') }}" alt="Page 1"></div>
+            <div class="page"><img src="{{ url_for('static', filename='2.png') }}" alt="Page 2"></div>
+            <div class="page"><img src="{{ url_for('static', filename='3.png') }}" alt="Page 3"></div>
+            <div class="page"><img src="{{ url_for('static', filename='4.png') }}" alt="Page 4"></div>
+            <div class="page"><img src="{{ url_for('static', filename='5.png') }}" alt="Page 5"></div>
+            <div class="page"><img src="{{ url_for('static', filename='6.png') }}" alt="Page 6"></div>
+            <div class="page"><img src="{{ url_for('static', filename='7.png') }}" alt="Page 7"></div>
+            <div class="page"><img src="{{ url_for('static', filename='8.png') }}" alt="Page 8"></div>
+            <div class="page"><img src="{{ url_for('static', filename='9.png') }}" alt="Page 9"></div>
+            <div class="page"><img src="{{ url_for('static', filename='10.png') }}" alt="Page 10"></div>
+            <div class="page"><img src="{{ url_for('static', filename='11.png') }}" alt="Page 11"></div>
+            <div class="page"><img src="{{ url_for('static', filename='12.png') }}" alt="Page 12"></div>
+            <div class="page"><img src="{{ url_for('static', filename='13.png') }}" alt="Page 13"></div>
+            <div class="page"><img src="{{ url_for('static', filename='14.png') }}" alt="Page 14"></div>
+            <div class="page"><img src="{{ url_for('static', filename='15.png') }}" alt="Page 15"></div>
+            <div class="page"><img src="{{ url_for('static', filename='16.png') }}" alt="Page 16"></div>
+            <div class="page"><img src="{{ url_for('static', filename='17.png') }}" alt="Page 17"></div>
+            <div class="page"><img src="{{ url_for('static', filename='18.png') }}" alt="Page 18"></div>
+            <div class="page"><img src="{{ url_for('static', filename='19.png') }}" alt="Page 19"></div>
+            <div class="page"><img src="{{ url_for('static', filename='20.png') }}" alt="Page 20"></div>
+            <div class="page"><img src="{{ url_for('static', filename='21.png') }}" alt="Page 21"></div>
+        </div>
+    </div>
+    
+    <div class="chat-container" id="chat-container">
+        <div class="chat-header">
+            Chatbot Pembelajaran
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Tulis pesan Anda disini...">
+            <button onclick="sendMessage()">Kirim</button>
+        </div>
+    </div>
+    <button class="chat-toggle" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+
+        function sendMessage() {
+            const message = chatInput.value;
+            if (message.trim() === '') return;
+
+            appendMessage('User', message);
+            chatInput.value = '';
+
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                appendMessage('Chatbot Keren', data.response);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function appendMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender === 'User' ? 'user-message' : 'bot-message');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function toggleChat() {
+            chatContainer.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
